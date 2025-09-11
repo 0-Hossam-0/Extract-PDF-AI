@@ -1,4 +1,4 @@
-import path from 'path';
+// logger.util.ts
 import winston from 'winston';
 
 export { createCombinedLogger };
@@ -24,69 +24,7 @@ const createLoggerFormat = (middlewareName: string) => {
   );
 };
 
-// Single logger function that only writes to combined logs
-const createCombinedLogger = (middlewareName: string) => {
-  const logDir = path.join(__dirname, '../../logs');
-
-  return winston.createLogger({
-    format: createLoggerFormat(middlewareName),
-    transports: [
-      // Only combined logs
-      new winston.transports.File({
-        filename: path.join(logDir, 'combined.log'),
-        level: 'info',
-      }),
-      new winston.transports.File({
-        filename: path.join(logDir, 'error.log'),
-        level: 'error',
-      }),
-    ],
-  });
-};
-
-// For middlewares that should only log to combined logs
-const createCombinedOnlyLogger = (middlewareName: string) => {
-  const logDir = path.join(__dirname, '../../logs');
-
-  return winston.createLogger({
-    format: createLoggerFormat(middlewareName),
-    transports: [
-      // Combined logs only
-      new winston.transports.File({
-        filename: path.join(logDir, 'combined.log'),
-        level: 'info',
-      }),
-      new winston.transports.File({
-        filename: path.join(logDir, 'error.log'),
-        level: 'error',
-      }),
-    ],
-  });
-};
-
-const sanitizeBody = (body: any): any => {
-  if (!body || typeof body !== 'object') return body;
-
-  const clone: Record<string, any> = { ...body };
-  for (const key of Object.keys(clone)) {
-    if (SENSITIVE_KEYS.includes(key)) {
-      clone[key] = '***REDACTED***';
-    } else if (typeof clone[key] === 'object') {
-      clone[key] = sanitizeBody(clone[key]);
-    }
-  }
-  return clone;
-};
-
-const formatValue = (value: any): string => {
-  if (value === null || value === undefined) return '';
-  if (typeof value === 'object') {
-    if (Object.keys(value).length === 0) return '';
-    return JSON.stringify(sanitizeBody(value));
-  }
-  return String(value);
-};
-
+// Pretty console format
 const consoleFormat = winston.format.combine(
   winston.format.timestamp({ format: TIMESTAMP_FORMAT }),
   winston.format.colorize(),
@@ -123,20 +61,53 @@ const fileFormat = winston.format.combine(
   winston.format.json()
 );
 
+const sanitizeBody = (body: any): any => {
+  if (!body || typeof body !== 'object') return body;
+
+  const clone: Record<string, any> = { ...body };
+  for (const key of Object.keys(clone)) {
+    if (SENSITIVE_KEYS.includes(key)) {
+      clone[key] = '***REDACTED***';
+    } else if (typeof clone[key] === 'object') {
+      clone[key] = sanitizeBody(clone[key]);
+    }
+  }
+  return clone;
+};
+
+const formatValue = (value: any): string => {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'object') {
+    if (Object.keys(value).length === 0) return '';
+    return JSON.stringify(sanitizeBody(value));
+  }
+  return String(value);
+};
+
+// Create a console transport to reuse
+const consoleTransport = new winston.transports.Console({
+  format: consoleFormat,
+});
+
+// Single logger function that only writes to console (was file)
+const createCombinedLogger = (middlewareName: string) => {
+  return winston.createLogger({
+    format: createLoggerFormat(middlewareName),
+    transports: [consoleTransport],
+  });
+};
+
+// For middlewares that should only log to combined logs (console only)
+const createCombinedOnlyLogger = (middlewareName: string) => {
+  return winston.createLogger({
+    format: createLoggerFormat(middlewareName),
+    transports: [consoleTransport],
+  });
+};
+
 const logger = winston.createLogger({
   level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  transports: [
-    new winston.transports.Console({ format: consoleFormat }),
-    new winston.transports.File({
-      filename: path.resolve('logs/error.log'),
-      level: 'error',
-      format: fileFormat,
-    }),
-    new winston.transports.File({
-      filename: path.resolve('logs/combined.log'),
-      format: fileFormat,
-    }),
-  ],
+  transports: [consoleTransport],
   exitOnError: false,
 });
 
