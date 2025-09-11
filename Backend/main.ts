@@ -13,7 +13,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'https://frontend-extract-pdf-ai.vercel.app',
+    origin: 'https://extract-pdf-ai.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
