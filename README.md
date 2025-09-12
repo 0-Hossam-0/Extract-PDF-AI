@@ -14,7 +14,8 @@ Backend‑Extract‑PDF‑AI is a TypeScript/Express API + Web monorepo for extr
 
 ## Demo
 
-[Video](https://github.com/0-Hossam-0/Extract-PDF-AI/blob/master/2025-09-11%2015-07-22(1).mp4)
+
+https://github.com/user-attachments/assets/21151a1a-0164-4aa3-8ee3-08dfd6a9413a
 
 ---
 
