@@ -21,7 +21,7 @@ https://github.com/user-attachments/assets/21151a1a-0164-4aa3-8ee3-08dfd6a9413a
 
 ## Screenshots
 <p align="center">
-  <img src="https://github.com/0-Hossam-0/Extract-PDF-AI/blob/master/Screenshots/Screenshot%20from%202025-09-11%2015-09-41.png" >
+  <img width="1307" height="906" alt="Image" src="https://github.com/user-attachments/assets/c99c6cd1-bd30-4574-8071-c5d70bc86dab" />
   <img src="https://github.com/0-Hossam-0/Extract-PDF-AI/blob/master/Screenshots/Screenshot%20from%202025-09-11%2015-09-41.png">
 </p>
 
